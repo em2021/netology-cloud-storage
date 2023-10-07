@@ -119,10 +119,14 @@ public class CloudStorageFileServiceImpl implements FileService {
         String newFilename = newFile.getName();
         String from = rootServerPath + "/" + user_id + "/" + filename;
         String path = rootServerPath + "/" + user_id + "/" + newFilename;
+        Integer result = 0;
         try {
             restClient.move(from, path, false);
-            cloudStorageFileJpaRepository.renameFile(filename, newFilename, user_id);
+            result = cloudStorageFileJpaRepository.renameFile(filename, newFilename, user_id);
         } catch (ServerIOException | IOException ex) {
+            if (result > 0) {
+                cloudStorageFileJpaRepository.renameFile(newFilename, filename, user_id);
+            }
             throw new UploadingFileError(ex.getMessage());
         }
     }

@@ -29,7 +29,7 @@ public interface CloudStorageFileJpaRepositoryCustom {
     @Modifying
     @Transactional
     @Query(("update CloudStorageFile f set f.name = :new_name where f.name like :name and f.owner = :owner"))
-    void renameFile(@Param("name") String filename,
+    Integer renameFile(@Param("name") String filename,
                     @Param("new_name") String newFilename,
                     @Param("owner") Integer userId);
 

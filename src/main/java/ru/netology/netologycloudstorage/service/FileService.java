@@ -18,7 +18,7 @@ public interface FileService {
 
     File createTempFile(File tempDir, int userId, MultipartFile file) throws IOException;
 
-    File downloadFile(int userId, String filename);
+    byte[] downloadFile(int userId, String filename);
 
     void deleteFile(int userId, String filename);
 

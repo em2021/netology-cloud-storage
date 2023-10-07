@@ -11,7 +11,6 @@ import ru.netology.netologycloudstorage.model.AuthorizationResponse;
 import ru.netology.netologycloudstorage.service.AuthorizationService;
 import ru.netology.netologycloudstorage.service.FileService;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -56,7 +55,7 @@ public class CloudStorageController {
     @GetMapping("/file")
     public ResponseEntity<?> downloadFile(@RequestHeader("auth-token") @NotNull String authToken,
                                           @RequestParam("filename") @NotNull String filename) {
-        File file = fileService.downloadFile(authorizationService.getUserIdBySession(authToken), filename);
+        byte[] file = fileService.downloadFile(authorizationService.getUserIdBySession(authToken), filename);
         return ResponseEntity.ok(file);
     }
 

@@ -72,20 +72,27 @@ public class CloudStorageFileServiceImpl implements FileService {
         return tempFile;
     }
 
-    public File downloadFile(int userId, String filename) {
+    public byte[] downloadFile(int userId, String filename) {
         if (filename.isBlank()) {
             throw new InputDataError("Error input data");
         }
         String path = rootServerPath + "/" + userId + "/" + filename;
         File saveTo;
+        byte[] fileBytes;
         try {
             saveTo = File.createTempFile("temp_" + userId + "_", ".tmp", tempDir);
             restClient.downloadFile(path, saveTo, null);
-            saveTo.deleteOnExit();
-        } catch (ServerException | IOException ex) {
+            fileBytes = new byte[Math.toIntExact(saveTo.length())];
+        } catch (ServerException | IOException | ArithmeticException ex) {
             throw new UploadingFileError(ex.getMessage());
         }
-        return saveTo;
+        try (FileOutputStream fos = new FileOutputStream(saveTo)) {
+            fos.write(fileBytes);
+        } catch (Exception ex){
+            throw new UploadingFileError(ex.getMessage());
+        }
+        saveTo.delete();
+        return fileBytes;
     }
 
     public void deleteFile(int userId, String filename) {

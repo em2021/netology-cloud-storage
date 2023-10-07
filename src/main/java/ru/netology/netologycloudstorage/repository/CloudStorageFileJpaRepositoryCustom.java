@@ -16,7 +16,7 @@ public interface CloudStorageFileJpaRepositoryCustom {
     @Transactional
     @Query(value = "insert into cloud_storage.files (name, size, owner)\n" +
             "values (:name, :size, :user_id)", nativeQuery = true)
-    void saveFile(@Param("name") String filename,
+    Integer saveFile(@Param("name") String filename,
                   @Param("size") Integer size,
                   @Param("user_id") Integer userId);
 

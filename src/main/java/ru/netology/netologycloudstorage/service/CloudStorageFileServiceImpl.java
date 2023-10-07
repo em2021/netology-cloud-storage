@@ -50,15 +50,19 @@ public class CloudStorageFileServiceImpl implements FileService {
     public void uploadFile(int userId, String filename, MultipartFile file) {
         makeFolder(userId);
         File tempFile;
+        Integer result = 0;
         try {
             tempFile = createTempFile(tempDir, userId, file);
             Link link = getUploadLink(filename, userId);
             restClient.uploadFile(link, true, tempFile, null);
-            cloudStorageFileJpaRepository.saveFile(filename, (int) file.getSize(), userId);
+            result = cloudStorageFileJpaRepository.saveFile(filename, (int) file.getSize(), userId);
+            tempFile.delete();
         } catch (ServerException | IOException ex) {
+            if (result > 0) {
+                deleteFile(userId, filename);
+            }
             throw new InputDataError(ex.getMessage());
         }
-        tempFile.delete();
     }
 
     public File createTempFile(File tempDir, int userId, MultipartFile file) throws IOException {

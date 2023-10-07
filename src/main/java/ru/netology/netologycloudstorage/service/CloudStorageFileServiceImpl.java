@@ -32,7 +32,7 @@ public class CloudStorageFileServiceImpl implements FileService {
     private final String user = "571cdb7cc0574b0b89fdb30f4eae2b95";
     private final String token = "y0_AgAAAAAx_OgHAAqRLAAAAADtyzvV45v73bZrSpyD6iKRY0kcWgahpws";
     private final Credentials credentials = new Credentials(user, token);
-    private final RestClient restClient = new RestClient(credentials);
+    private RestClient restClient = new RestClient(credentials);
     private final String rootServerPath = "/Приложения/netology-cloud-storage";
     private final File tempDir = new File("src/main/resources/temp");
 
@@ -57,10 +57,10 @@ public class CloudStorageFileServiceImpl implements FileService {
             restClient.uploadFile(link, true, tempFile, null);
             result = cloudStorageFileJpaRepository.saveFile(filename, (int) file.getSize(), userId);
             tempFile.delete();
-        } catch (ServerException | IOException ex) {
-            if (result > 0) {
+            if (result == 0) {
                 deleteFile(userId, filename);
             }
+        } catch (ServerException | IOException ex) {
             throw new InputDataError(ex.getMessage());
         }
     }
@@ -123,10 +123,10 @@ public class CloudStorageFileServiceImpl implements FileService {
         try {
             restClient.move(from, path, false);
             result = cloudStorageFileJpaRepository.renameFile(filename, newFilename, user_id);
-        } catch (ServerIOException | IOException ex) {
             if (result > 0) {
                 cloudStorageFileJpaRepository.renameFile(newFilename, filename, user_id);
             }
+        } catch (ServerIOException | IOException ex) {
             throw new UploadingFileError(ex.getMessage());
         }
     }

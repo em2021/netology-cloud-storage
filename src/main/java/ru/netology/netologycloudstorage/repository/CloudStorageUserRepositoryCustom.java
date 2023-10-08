@@ -23,11 +23,11 @@ public interface CloudStorageUserRepositoryCustom {
         @Transactional
         @Query(value = "insert into cloud_storage.user_sessions (session_id, user_id) values (:session_id, :user_id)",
                 nativeQuery = true)
-        void saveSessionId(@Param("session_id") String sessionId,
+        Integer saveSessionId(@Param("session_id") String sessionId,
                            @Param("user_id") Integer userId);
 
         @Modifying
         @Transactional
         @Query(("delete from UserSession s where s.sessionId ilike :sessionId"))
-        void deleteUserSession(@Param("sessionId") String sessionId);
+        Integer deleteUserSession(@Param("sessionId") String sessionId);
 }

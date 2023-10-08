@@ -58,11 +58,12 @@ public class CloudStorageAuthorizationServiceImpl implements AuthorizationServic
 
     public void logoutUser(String sessionId) {
         logger.info("Searching for user session: {} to delete...", sessionId);
-        Integer result = cloudStorageUserJpaRepository.deleteUserSession(trimSessionId(sessionId));
+        String trimmedSession = trimSessionId(sessionId);
+        Integer result = cloudStorageUserJpaRepository.deleteUserSession(trimmedSession);
         if (result == 0) {
-            logger.error("User session: {} not found...", sessionId);
+            logger.error("User session: {} not found...", trimmedSession);
         } else {
-            logger.info("User session: {} deleted successfully...", sessionId);
+            logger.info("User session: {} deleted successfully...", trimmedSession);
         }
     }
 
@@ -80,7 +81,6 @@ public class CloudStorageAuthorizationServiceImpl implements AuthorizationServic
     }
 
     public String trimSessionId(String sessionId) {
-        logger.info("Trimming session: {}...", sessionId);
         return sessionId.replace("Bearer ", "");
     }
 }

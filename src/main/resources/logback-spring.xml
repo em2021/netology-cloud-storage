@@ -43,7 +43,7 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <logger name="r.n.ncs.s.CloudStorageAuthorizationService" level="info" additivity="false">
+    <logger name="r.n.ncs.s.CloudStorageFileServiceImpl" level="info" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>

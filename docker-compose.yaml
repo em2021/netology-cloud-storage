@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  front:
+    container_name: csf
+    depends_on: [back]
+    ports:
+      - '8081:8080'
+    build:
+      context: .
+      dockerfile: nodeapp.Dockerfile
+  back:
+    container_name: csb
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '8080:8080'
+    links:
+      - db
+    build: .
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/cloud_storage
+      DATABASE_USER: postgres
+      DATABASE_PASS: postgres
+  db:
+    container_name: csdb
+    image: postgres:12.16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cloud_storage
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: "exit 0"

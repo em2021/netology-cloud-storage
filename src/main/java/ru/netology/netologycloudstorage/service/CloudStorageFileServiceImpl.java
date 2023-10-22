@@ -37,8 +37,15 @@ public class CloudStorageFileServiceImpl implements FileService {
     private final Credentials credentials = new Credentials(user, token);
     private RestClient restClient = new RestClient(credentials);
     private final String rootServerPath = "/Приложения/netology-cloud-storage";
-    private final File tempDir = new File("src/main/resources/temp");
+    private final File tempDir = initTempDir();
 
+    private File initTempDir() {
+        File tempDir = new File("src/main/resources/temp");
+        if (!tempDir.exists()) {
+            tempDir.mkdir();
+        }
+        return tempDir;
+    }
     public Link getUploadLink(String filename, int userId) {
         String serverPath = rootServerPath + "/" + userId + "/" + filename;
         Link link;
@@ -69,7 +76,7 @@ public class CloudStorageFileServiceImpl implements FileService {
             logger.info("Deleting temporary file at path: {}...", tempFile.getPath());
             boolean res = tempFile.delete();
             if (res) {
-                logger.info("Deleting temporary file at path: {}...", tempFile.getPath());
+                logger.info("Temporary file at path: {} deleted successfully...", tempFile.getPath());
             } else {
                 logger.info("Error occurred while deleting temporary file at path: {}...", tempFile.getPath());
             }
@@ -96,6 +103,7 @@ public class CloudStorageFileServiceImpl implements FileService {
         } catch (IOException ex) {
             logger.error("Error occurred while creating " +
                     "temp file at path: {}...", tempFile.getPath());
+            logger.error("Error message: {}", ex.getMessage());
         }
         logger.info("Temp file at path: {} created successfully...", tempFile.getPath());
         return tempFile;
@@ -118,8 +126,8 @@ public class CloudStorageFileServiceImpl implements FileService {
             logger.error("Error occurred while downloading file to path: {}...", path);
             throw new UploadingFileError(ex.getMessage());
         }
-        try (FileOutputStream fos = new FileOutputStream(saveTo)) {
-            fos.write(fileBytes);
+        try (FileInputStream fis = new FileInputStream(saveTo)) {
+            fis.read(fileBytes);
         } catch (Exception ex) {
             logger.error("Error occurred while retrieving bytes from temporary file: {}...", saveTo.getPath());
             throw new UploadingFileError(ex.getMessage());
@@ -190,7 +198,7 @@ public class CloudStorageFileServiceImpl implements FileService {
             restClient.makeFolder(path);
         } catch (Exception ex) {
             logger.error("Error occurred while creating folder on cloud server for user: {}, at path: {}", userId, path);
-            System.out.println(ex.getMessage());
+            logger.error("Error message: {}", ex.getMessage());
         }
         logger.info("Folder on cloud server for user: {}, at path: {} created successfully", userId, path);
     }
